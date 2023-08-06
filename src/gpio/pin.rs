@@ -117,9 +117,42 @@ where
 
 pub type SpecificPin<P> = Pin<<P as AnyPin>::Id, <P as AnyPin>::Mode>;
 
-// pub enum Gpio42 {}
-// impl PinId for Gpio42 {
-//     fn num(&self) -> u32 {
-//         42
-//     }
-// }
+/// [`embedded_hal`] traits
+impl<I, C> OutputPin for Pin<I, Output<C>>
+where
+    I: PinId,
+    C: OutputConfig,
+{
+    type Error = Infallible;
+    fn set_high(&mut self) -> Result<(), Self::Error> {
+        self.registers.write_pin(true);
+        Ok(())
+    }
+    fn set_low(&mut self) -> Result<(), Self::Error> {
+        self.registers.write_pin(false);
+        Ok(())
+    }
+}
+
+impl<I, C> InputPin for Pin<I, Input<C>>
+where
+    I: PinId,
+    C: InputConfig,
+{
+    type Error = Infallible;
+    #[allow(clippy::bool_comparison)] // more explicit this way
+    fn is_high(&self) -> Result<bool, Self::Error> {
+        Ok(self.registers.read_pin() == true)
+    }
+    #[allow(clippy::bool_comparison)] // more explicit this way
+    fn is_low(&self) -> Result<bool, Self::Error> {
+        Ok(self.registers.read_pin() == false)
+    }
+}
+
+/// Specific pin implementations
+pub enum Gpio42 {}
+impl PinId for Gpio42 {
+    type Reset = PushPullOutput;
+    const DYN: DynPinId = DynPinId { num: 42 };
+}
