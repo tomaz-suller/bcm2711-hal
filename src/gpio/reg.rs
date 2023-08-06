@@ -70,7 +70,8 @@ pub(super) unsafe trait RegisterInterface {
             != 0
     }
 
-    fn write_pin(&self, bit: bool) {
+    // TODO Receive embedded_hal `PinSate` as argument
+    fn write_pin(&mut self, bit: bool) {
         let mask = self.mask();
         unsafe {
             match self.id().group() {
@@ -93,7 +94,7 @@ pub(super) unsafe trait RegisterInterface {
         };
     }
 
-    fn change_mode(&self, mode: DynPinMode) {
+    fn change_mode(&mut self, mode: DynPinMode) {
         let fields: ModeFields = mode.into();
         let fsel_offset = self.id().num % 10;
         let fsel = (u8::from(fields.fsel) << fsel_offset) as u32;
