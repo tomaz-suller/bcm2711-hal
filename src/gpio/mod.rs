@@ -1,3 +1,3 @@
-mod pin;
-mod reg;
 mod dynpin;
+pub mod pin;
+mod reg;

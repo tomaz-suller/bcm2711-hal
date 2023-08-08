@@ -1,6 +1,10 @@
+use core::convert::Infallible;
+use core::marker::PhantomData;
+
+use embedded_hal::digital::v2::{InputPin, OutputPin};
+
 use super::dynpin::{DynInput, DynOutput, DynPinId, DynPinMode};
 use super::reg::RegisterInterface;
-use core::marker::PhantomData;
 
 pub enum Floating {}
 pub enum PullDown {}
@@ -45,6 +49,9 @@ impl OutputConfig for Readable {
 pub struct Output<C: OutputConfig> {
     _config: PhantomData<C>,
 }
+
+pub type PushPullOutput = Output<PushPull>;
+pub type ReadableOutput = Output<Readable>;
 
 pub trait PinMode {
     const DYN: DynPinMode;
@@ -97,11 +104,35 @@ where
     I: PinId,
     M: PinMode,
 {
-    id: PhantomData<I>,
+    registers: Registers<I>,
     mode: PhantomData<M>,
 }
 
-pub trait AnyPin {
+impl<I, M> Pin<I, M>
+where
+    I: PinId,
+    M: PinMode,
+{
+    pub unsafe fn new() -> Self {
+        Pin {
+            registers: Registers::new(),
+            mode: PhantomData,
+        }
+    }
+
+    pub fn into_mode<N: PinMode>(mut self) -> Pin<I, N> {
+        if N::DYN != M::DYN {
+            self.registers.change_mode::<N>();
+        }
+        unsafe { Pin::new() }
+    }
+}
+
+pub trait AnyPin
+where
+    Self: From<SpecificPin<Self>>,
+    Self: Into<SpecificPin<Self>>,
+{
     type Id: PinId;
     type Mode: PinMode;
 }

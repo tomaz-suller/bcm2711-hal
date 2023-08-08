@@ -60,6 +60,7 @@ pub(super) unsafe trait RegisterInterface {
         1 << (self.id().num % 32)
     }
 
+    // TODO Output embedded_hal `PinSate`
     fn read_pin(&self) -> bool {
         let mask = self.mask();
         (match self.id().group() {
@@ -81,14 +82,14 @@ pub(super) unsafe trait RegisterInterface {
                     } else {
                         (*pac::GPIO::ptr()).gpclr0.write_with_zero(|w| w.bits(mask));
                     }
-                },
+                }
                 1 => {
                     if bit {
                         (*pac::GPIO::ptr()).gpset1.write_with_zero(|w| w.bits(mask));
                     } else {
                         (*pac::GPIO::ptr()).gpclr1.write_with_zero(|w| w.bits(mask));
                     }
-                },
+                }
                 _ => unreachable!(),
             }
         };
@@ -100,12 +101,24 @@ pub(super) unsafe trait RegisterInterface {
         let fsel = (u8::from(fields.fsel) << fsel_offset) as u32;
         unsafe {
             match self.id().fsel_group() {
-                0 => (*pac::GPIO::ptr()).gpfsel0.write_with_zero(|w| w.bits(fsel)),
-                1 => (*pac::GPIO::ptr()).gpfsel1.write_with_zero(|w| w.bits(fsel)),
-                2 => (*pac::GPIO::ptr()).gpfsel2.write_with_zero(|w| w.bits(fsel)),
-                3 => (*pac::GPIO::ptr()).gpfsel3.write_with_zero(|w| w.bits(fsel)),
-                4 => (*pac::GPIO::ptr()).gpfsel4.write_with_zero(|w| w.bits(fsel)),
-                5 => (*pac::GPIO::ptr()).gpfsel5.write_with_zero(|w| w.bits(fsel)),
+                0 => (*pac::GPIO::ptr())
+                    .gpfsel0
+                    .write_with_zero(|w| w.bits(fsel)),
+                1 => (*pac::GPIO::ptr())
+                    .gpfsel1
+                    .write_with_zero(|w| w.bits(fsel)),
+                2 => (*pac::GPIO::ptr())
+                    .gpfsel2
+                    .write_with_zero(|w| w.bits(fsel)),
+                3 => (*pac::GPIO::ptr())
+                    .gpfsel3
+                    .write_with_zero(|w| w.bits(fsel)),
+                4 => (*pac::GPIO::ptr())
+                    .gpfsel4
+                    .write_with_zero(|w| w.bits(fsel)),
+                5 => (*pac::GPIO::ptr())
+                    .gpfsel5
+                    .write_with_zero(|w| w.bits(fsel)),
                 _ => unreachable!(),
             }
         }
