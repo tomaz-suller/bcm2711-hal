@@ -28,6 +28,12 @@ impl From<FunctionSelect> for u8 {
     }
 }
 
+impl From<FunctionSelect> for u32 {
+    fn from(value: FunctionSelect) -> Self {
+        u8::from(value) as u32
+    }
+}
+
 impl Default for FunctionSelect {
     fn default() -> Self {
         FunctionSelect::Input
@@ -97,8 +103,8 @@ pub(super) unsafe trait RegisterInterface {
 
     fn change_mode(&mut self, mode: DynPinMode) {
         let fields: ModeFields = mode.into();
-        let fsel_offset = self.id().num % 10;
-        let fsel = (u8::from(fields.fsel) << fsel_offset) as u32;
+        let fsel_offset = (self.id().num % 10) * 3;
+        let fsel = u32::from(fields.fsel) << fsel_offset;
         unsafe {
             match self.id().fsel_group() {
                 0 => (*pac::GPIO::ptr())
