@@ -192,3 +192,9 @@ impl PinId for Gpio42 {
     type Reset = PullDownInput;
     const DYN: DynPinId = DynPinId { num: 42 };
 }
+
+pub enum Gpio0 {}
+impl PinId for Gpio0 {
+    type Reset = PullUpInput;
+    const DYN: DynPinId = DynPinId { num: 0 };
+}
