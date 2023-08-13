@@ -32,6 +32,11 @@ pub struct Input<C: InputConfig> {
     _config: PhantomData<C>,
 }
 
+pub type FloatingInput = Input<Floating>;
+pub type PullDownInput = Input<PullDown>;
+pub type PullUpInput = Input<PullUp>;
+pub type BusKeepInput = Input<BusKeep>;
+
 pub trait OutputConfig {
     const DYN: DynOutput;
 }
@@ -184,6 +189,6 @@ where
 /// Specific pin implementations
 pub enum Gpio42 {}
 impl PinId for Gpio42 {
-    type Reset = PushPullOutput;
+    type Reset = PullDownInput;
     const DYN: DynPinId = DynPinId { num: 42 };
 }
